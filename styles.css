@@ -131,7 +131,8 @@ button { font: inherit; color: inherit; }
 }
 .sky--left  .sky-art { left: calc(-0.5 * var(--su)); }
 .sky--right .sky-art { left: calc(-538.5 * var(--su)); }
-.sky-art img { width: 100%; height: 100%; object-fit: cover; filter: brightness(1.08); }
+.sky-art img { width: 100%; height: 100%; object-fit: cover; filter: brightness(1.08);
+  transform: translate(calc(var(--tilt-x, 0px) * -0.6), calc(var(--tilt-y, 0px) * -0.6)); } /* drifts against the figure on phone tilt */
 /* Figma 24:858: white 2px stroke, 744.85×216.23 at (40.83, 379.81) */
 .hero-line {
   position: absolute; left: calc(39.8 * var(--su)); top: calc(378.8 * var(--su));
@@ -143,7 +144,7 @@ button { font: inherit; color: inherit; }
 .figure {
   position: absolute; left: 50%; bottom: 0;
   height: calc(684 * var(--u)); aspect-ratio: 396 / 684;
-  transform: translate(-50%, 11.8%); z-index: 2; /* in front of the rising text */
+  transform: translate(calc(-50% + var(--tilt-x, 0px)), calc(11.8% + var(--tilt-y, 0px))); z-index: 2; /* in front of the rising text; --tilt-* from phone tilt */
   pointer-events: none; user-select: none;
 }
 .figure img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
@@ -170,7 +171,7 @@ button { font: inherit; color: inherit; }
 @media (max-width: 520px) {
   .hero h1 { white-space: normal; }
   /* keep man + cat inside a phone screen */
-  .figure { height: min(56vh, 520px); transform: translate(-50%, 2%); }
+  .figure { height: min(56vh, 520px); transform: translate(calc(-50% + var(--tilt-x, 0px)), calc(2% + var(--tilt-y, 0px))); }
 }
 @media (prefers-reduced-motion: reduce) {
   .rise { animation: none !important; }

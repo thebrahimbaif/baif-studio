@@ -12,6 +12,7 @@
   var heads = {};
   figure.querySelectorAll('[data-pose]').forEach(function (img) { heads[img.getAttribute('data-pose')] = img; });
   var pose = 'down', watching = false, touchTimer = 0;
+  var tiltPose = null; // set by phone tilt (see below); where he looks when nothing else holds his attention
   var REACH = 0.6; // attention radius as a share of the figure's height
 
   function setPose(p) {
@@ -20,7 +21,7 @@
     heads[p].classList.add('on');
     pose = p;
   }
-  function rest() { watching = false; clearTimeout(touchTimer); setPose('down'); }
+  function rest() { watching = false; clearTimeout(touchTimer); setPose(tiltPose || 'down'); }
 
   function track(e) {
     // Art is 396 × 684, drawn with object-fit: contain; head centre sits at (195, 262).
@@ -103,6 +104,70 @@
   hero.addEventListener('pointermove', function (e) { trail(e); track(e); });
   hero.addEventListener('pointerdown', track);
   hero.addEventListener('pointerleave', function () { lastPoint = null; rest(); });
+
+  /* ─────────────────────────────────────────────
+     Phones: tilt the phone and he looks that way; the scene shifts slightly for depth.
+     Uses deviceorientation (needs HTTPS). iOS only grants it after a tap, so the first
+     tap on the page (anywhere but the Contact button) asks for permission.
+     The resting angle is learned from the first readings and slowly re-centres, so
+     however the phone is held, holding it still means he goes back to his laptop.
+     ───────────────────────────────────────────── */
+  var touchOnly = window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  if (touchOnly && !calm && 'DeviceOrientationEvent' in window) {
+    var base = null, latest = null, tiltFrame = 0, sx = 0, sy = 0;
+    var ON = 10, OFF = 6, SHIFT = 12; // degrees to turn his head, degrees to let go, max px of drift
+
+    function applyTilt() {
+      tiltFrame = 0;
+      if (!latest) return;
+      var g = latest.g, b = latest.b;
+      if (!base) base = { g: g, b: b };
+      // drift the resting angle toward how the phone is being held now
+      base.g += (g - base.g) * 0.004;
+      base.b += (b - base.b) * 0.004;
+      var dx = Math.max(-30, Math.min(30, g - base.g));   // + tilts right
+      var dy = Math.max(-30, Math.min(30, b - base.b));   // + top of phone toward the viewer (more upright)
+
+      // head: hysteresis so it does not flicker around the thresholds
+      var held = tiltPose && tiltPose !== 'down';
+      var lim = held ? OFF : ON, next = 'down';
+      if (Math.abs(dx) > lim || dy > lim) {
+        next = Math.abs(dx) >= dy ? (dx < 0 ? 'left' : 'right') : 'up';
+      }
+      tiltPose = next;
+      if (!watching) setPose(next);
+
+      // depth: figure leans with the tilt, sky drifts the other way (smoothed)
+      sx += (dx / 30 * SHIFT - sx) * 0.2;
+      sy += (dy / 30 * SHIFT - sy) * 0.2;
+      hero.style.setProperty('--tilt-x', sx.toFixed(2) + 'px');
+      hero.style.setProperty('--tilt-y', sy.toFixed(2) + 'px');
+      if (Math.abs(sx - dx / 30 * SHIFT) > 0.1 || Math.abs(sy - dy / 30 * SHIFT) > 0.1) {
+        tiltFrame = requestAnimationFrame(applyTilt);
+      }
+    }
+    function onOrient(e) {
+      if (e.gamma == null || e.beta == null) return;
+      latest = { g: e.gamma, b: e.beta };
+      if (!tiltFrame) tiltFrame = requestAnimationFrame(applyTilt);
+    }
+    function listen() { window.addEventListener('deviceorientation', onOrient); }
+
+    var ask = window.DeviceOrientationEvent.requestPermission;
+    if (typeof ask === 'function') {
+      // iOS 13+: must be requested from a tap
+      var askOnce = function (e) {
+        if (e.target.closest && e.target.closest('.cta')) return;
+        document.removeEventListener('click', askOnce);
+        ask.call(window.DeviceOrientationEvent).then(function (state) {
+          if (state === 'granted') listen();
+        }).catch(function () {});
+      };
+      document.addEventListener('click', askOnce);
+    } else {
+      listen();
+    }
+  }
 
   /* ───────── Contact button: grows to reveal the email on hover / keyboard focus ─────────
      The two label widths are measured so the pill can animate between them
