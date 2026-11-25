@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Baif — Design studio</title>
+<meta name="description" content="Baif pairs traditional design discipline with AI to build apps, websites, brands, and animations that feel considered, not generated.">
+<meta name="theme-color" content="#FFFBF1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="assets/figure-body.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- ───────── Header ───────── -->
+<header class="site-header" id="header">
+  <a class="logo" href="#top" aria-label="Baif Studio, home"><img src="assets/logo.svg" alt="" width="109" height="63"></a>
+</header>
+
+<main id="main">
+
+<!-- ───────── Hero ───────── -->
+<section class="hero" id="top" aria-label="Introduction">
+  <canvas class="trail" aria-hidden="true"></canvas>
+  <div class="hero-grid">
+    <!-- Sketched sky in the corners: two windows onto one drawing, clipped by sky-mask.svg (Figma 24:865 / 24:866) -->
+    <div class="sky sky--left" aria-hidden="true"><div class="sky-art"><img src="assets/sky.jpg" alt="" draggable="false"></div></div>
+    <div class="sky sky--right" aria-hidden="true"><div class="sky-art"><img src="assets/sky.jpg" alt="" draggable="false"></div></div>
+    <img class="hero-line" src="assets/line.svg" alt="" aria-hidden="true" draggable="false" width="746.851" height="218.226">
+    <div class="hero-copy">
+      <div class="hero-text">
+        <h1 class="rise">Timeless craft. Modern tools.</h1>
+        <p class="rise intro-copy">We pair traditional design discipline with AI to build apps, websites, brands, and animations that feel considered, not generated.</p>
+      </div>
+      <a class="cta rise" href="mailto:Contact@Baifstudio.com" aria-label="Contact us: Contact@Baifstudio.com">
+        <span class="cta-label">Contact</span>
+        <span class="cta-email" aria-hidden="true">Contact@Baifstudio.com</span>
+      </a>
+    </div>
+    <figure class="figure" role="img" aria-label="Engraved-style illustration of a man in glasses working on a laptop in a desk chair, with a cat sitting beside him looking up. His head turns to follow your cursor when it comes close.">
+      <img src="assets/cat.png" alt="" draggable="false" class="cat">
+      <img src="assets/figure-body.png" alt="" draggable="false">
+      <img src="assets/head-down.png" alt="" draggable="false" data-pose="down" class="on">
+      <img src="assets/head-left.png" alt="" draggable="false" data-pose="left">
+      <img src="assets/head-right.png" alt="" draggable="false" data-pose="right">
+      <img src="assets/head-up.png" alt="" draggable="false" data-pose="up">
+    </figure>
+  </div>
+</section>
+
+</main>
+<script src="main.js"></script>
+</body>
+</html>
